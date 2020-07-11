@@ -4,6 +4,9 @@ __pycache__
 *.swo
 *.orig
 .idea
+experiments/
+datasets/
+eval_registration/
 outputs/
 *.pyc
 *.ply

@@ -15,7 +15,7 @@ def str2bool(v):
 
 
 logging_arg = add_argument_group('Logging')
-logging_arg.add_argument('--out_dir', type=str, default='outputs')
+logging_arg.add_argument('--out_dir', type=str, default='experiments/voxel_size_0.005_mul_1.5_hit_0.02')
 
 trainer_arg = add_argument_group('Trainer')
 trainer_arg.add_argument('--trainer', type=str, default='HardestContrastiveLossTrainer')
@@ -54,7 +54,7 @@ trainer_arg.add_argument('--val_epoch_freq', type=int, default=1)
 trainer_arg.add_argument(
     '--positive_pair_search_voxel_size_multiplier', type=float, default=1.5)
 
-trainer_arg.add_argument('--hit_ratio_thresh', type=float, default=0.1)
+trainer_arg.add_argument('--hit_ratio_thresh', type=float, default=0.02)
 
 # Triplets
 trainer_arg.add_argument('--triplet_num_pos', type=int, default=256)
@@ -98,27 +98,17 @@ misc_arg.add_argument('--train_num_thread', type=int, default=2)
 misc_arg.add_argument('--val_num_thread', type=int, default=1)
 misc_arg.add_argument('--test_num_thread', type=int, default=2)
 misc_arg.add_argument('--fast_validation', type=str2bool, default=False)
-misc_arg.add_argument(
-    '--nn_max_n',
-    type=int,
-    default=500,
+misc_arg.add_argument('--nn_max_n', type=int, default=500,
     help='The maximum number of features to find nearest neighbors in batch')
 
 # Dataset specific configurations
 data_arg = add_argument_group('Data')
 data_arg.add_argument('--dataset', type=str, default='ThreeDMatchPairDataset')
-data_arg.add_argument('--voxel_size', type=float, default=0.025)
-data_arg.add_argument(
-    '--threed_match_dir', type=str, default="/home/chrischoy/datasets/FCGF/threedmatch")
-data_arg.add_argument(
-    '--kitti_root', type=str, default="/home/chrischoy/datasets/FCGF/kitti/")
-data_arg.add_argument(
-    '--kitti_max_time_diff',
-    type=int,
-    default=3,
-    help='max time difference between pairs (non inclusive)')
+data_arg.add_argument('--voxel_size', type=float, default=0.005)
+data_arg.add_argument('--threed_match_dir', type=str, default="/freespace/local/datasets/icra21_dataset/data")
+data_arg.add_argument('--kitti_root', type=str, default="home/chrischoy/datasets/FCGF/threedmatch")
+data_arg.add_argument('--kitti_max_time_diff', type=int, default=3, help='max time difference between pairs (non inclusive)')
 data_arg.add_argument('--kitti_date', type=str, default='2011_09_26')
-
 
 def get_config():
   args = parser.parse_args()

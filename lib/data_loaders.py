@@ -49,8 +49,12 @@ def collate_pair_fn(list_data):
 
     trans_batch.append(to_tensor(trans[batch_id]))
 
-    matching_inds_batch.append(
-        torch.from_numpy(np.array(matching_inds[batch_id]) + curr_start_inds))
+    try:
+        matching_inds_batch.append(
+            torch.from_numpy(np.array(matching_inds[batch_id]) + curr_start_inds))
+    except:
+        print(matching_inds)
+
     len_batch.append([N0, N1])
 
     # Move the head
@@ -255,6 +259,9 @@ class IndoorPairDataset(PairDataset):
     pcd1.points = o3d.utility.Vector3dVector(np.array(pcd1.points)[sel1])
     # Get matches
     matches = get_matching_indices(pcd0, pcd1, trans, matching_search_voxel_size)
+    if len(matches) == 0:
+      print(file0, file1)
+      raise ValueError(f"{drive}, {t0}, {t1}")
 
     # Get features
     npts0 = len(pcd0.colors)
@@ -625,15 +632,27 @@ class KITTINMPairDataset(KITTIPairDataset):
 
 
 class ThreeDMatchPairDataset(IndoorPairDataset):
-  OVERLAP_RATIO = 0.3
+  OVERLAP_RATIO = 0.5
   DATA_FILES = {
-      'train': './config/train_3dmatch.txt',
-      'val': './config/val_3dmatch.txt',
-      'test': './config/test_3dmatch.txt'
+      # 'train': './config/train_3dmatch.txt',
+      # 'val': './config/val_3dmatch.txt',
+      # 'test': './config/test_3dmatch.txt'
+      'train': './config/train_icra21.txt',
+      'val': './config/val_icra21.txt',
+      'test': './config/test_icra21.txt'
   }
 
 
-ALL_DATASETS = [ThreeDMatchPairDataset, KITTIPairDataset, KITTINMPairDataset]
+class CustomizedDataset(IndoorPairDataset):
+  OVERLAP_RATIO = 0.5
+  DATA_FILES = {
+      'train': './config/train_icra21.txt',
+      'val': './config/val_icra21.txt',
+      'test': './config/test_icra21.txt'
+  }
+
+
+ALL_DATASETS = [ThreeDMatchPairDataset, KITTIPairDataset, KITTINMPairDataset, CustomizedDataset]
 dataset_str_mapping = {d.__name__: d for d in ALL_DATASETS}
 
 
