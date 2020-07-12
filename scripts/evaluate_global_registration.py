@@ -200,7 +200,10 @@ def update_unseen_cloud(model_seen_cloud, model_unseen_cloud, scene_unseen_cloud
 
         empty_indices.append(idx)
 
-    updated_scene_unseen_cloud = scene_unseen_cloud.select_down_sample(empty_indices, True)
+    if o3d.__version__ == '0.10.0.0':
+        updated_scene_unseen_cloud = scene_unseen_cloud.select_by_index(empty_indices, True)
+    else:
+        updated_scene_unseen_cloud = scene_unseen_cloud.select_down_sample(empty_indices, True)
     return updated_scene_unseen_cloud
 
 
