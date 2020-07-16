@@ -27,19 +27,16 @@ o3d.utility.set_verbosity_level(o3d.utility.VerbosityLevel.Error)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--source1', default=None, type=str, help='path to the source point cloud')
-    parser.add_argument('--source2', default=None, type=str, help='path to the target point cloud')
-    parser.add_argument('--model', default=None, type=str, help='path to the checkpoint')
-    parser.add_argument('--voxel_size', default=0.005, type=float, help='voxel size (m) to preprocess point cloud')
+    parser.add_argument('--source1', default=None, type=str, help='path to the source point cloud', required=True)
+    parser.add_argument('--source2', default=None, type=str, help='path to the target point cloud', required=True)
+    parser.add_argument('--checkpoint', default=None, type=str, help='path to the checkpoint', required=True)
+    parser.add_argument('--voxel_size', default=0.01, type=float, help='voxel size (m) to preprocess point cloud')
     args = parser.parse_args()
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-    assert args.model is not None
-    assert args.source1 is not None
-
-    checkpoint = torch.load(args.model, map_location='cpu')
+    checkpoint = torch.load(args.checkpoint, map_location=device)
     config = checkpoint['config']
+    print(config)
 
     num_feats = 1
     Model = load_model(config.model)
