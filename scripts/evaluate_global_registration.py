@@ -232,20 +232,23 @@ def execute_ransac_registration(source_down, target_down, source_fpfh, target_fp
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--checkpoint', default=None, type=str, help='path to latest checkpoint (default: None)')
+    parser.add_argument('--checkpoint', default=None, type=str, help='path to checkpoint')
     parser.add_argument('--voxel_size', default=0.005, type=float, help='voxel size to preprocess point cloud')
     parser.add_argument('--data_path', default='./eval_registration', type=str)
     parser.add_argument('--object_model', default='bleach', type=str)
-    parser.add_argument('--output_dir', default='.', type=str)
     args = parser.parse_args()
 
     data_path = args.data_path
     assert args.checkpoint is not None
-    os.makedirs(os.path.join(args.output_dir, args.object_model), exist_ok=True)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    output_txt = open(os.path.join(args.output_dir, "result_" + args.object_model + '.txt'), 'w')
+    checkpoint_dir = os.path.dirname(args.checkpoint)
+    basename = os.path.basename(args.checkpoint)
+    print(checkpoint_dir)
+    print(basename)
+    os.makedirs(os.path.join(checkpoint_dir, "eval_results"), exist_ok=True)
+    output_txt = open(os.path.join(checkpoint_dir, f"eval_{args.object_model}_{basename}.txt"), 'w')
 
     checkpoint = torch.load(args.checkpoint, map_location='cpu')
     config = checkpoint['config']
@@ -322,11 +325,11 @@ if __name__ == '__main__':
                 pcd1_seen.transform(ransac_result.transformation)
                 pcd1_unseen.transform(ransac_result.transformation)
 
-                combined_pcd2 = pcd2_seen_temp + pcd2_unseen_temp
-                combined_cloud = pcd1_seen + pcd1_unseen + combined_pcd2
-                output_cloud_path = os.path.join(args.output_dir, args.object_model,
-                                                 testcases[i] + '_' + testcases[j] + '.ply')
-                o3d.io.write_point_cloud(output_cloud_path, combined_cloud)
+                # combined_pcd2 = pcd2_seen_temp + pcd2_unseen_temp
+                # combined_cloud = pcd1_seen + pcd1_unseen + combined_pcd2
+                # output_cloud_path = os.path.join(args.output_dir, args.object_model,
+                #                                  testcases[i] + '_' + testcases[j] + '.ply')
+                # o3d.io.write_point_cloud(output_cloud_path, combined_cloud)
 
                 gt_pose_filepath = os.path.join(data_path, testcases[i], 'gt.yml')
                 gt_pose = load_pose(gt_pose_filepath)
@@ -334,14 +337,14 @@ if __name__ == '__main__':
                 update_seen_cloud(pcd2_seen, pcd2_unseen, pcd1_seen)
                 pcd2_unseen = update_unseen_cloud(pcd1_seen, pcd1_unseen, pcd2_unseen)
 
-                pcd2_complete_init = pcd2_seen_temp + pcd2_unseen_temp
+                # pcd2_complete_init = pcd2_seen_temp + pcd2_unseen_temp
                 pcd2_complete_final = pcd2_seen + pcd2_unseen
 
                 object_model_voxelized = o3d.io.read_point_cloud(object_model_path)
                 precision, recall = eval_shape(pcd2_complete_final, object_model_voxelized, gt_pose)
 
-                transformed_obj_model = copy.deepcopy(object_model_voxelized)
-                transformed_obj_model.transform(gt_pose)
+                # transformed_obj_model = copy.deepcopy(object_model_voxelized)
+                # transformed_obj_model.transform(gt_pose)
 
                 txt = '%s %s %f %f\n' % (testcases[i], testcases[j], precision, recall)
                 print(txt, end='', flush=True)
