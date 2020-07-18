@@ -14,8 +14,8 @@ import torch
 from model import load_model
 from util.misc import extract_features
 from util.file import ensure_dir
-from util.pointcloud import make_open3d_point_cloud, evaluate_feature_3dmatch, make_open3d_feature
-from util.visualization import get_colored_point_cloud_feature
+from util.pointcloud import make_open3d_point_cloud, make_open3d_feature
+from util.visualization import get_colored_point_cloud_feature, visualize_correspondence
 
 
 ch = logging.StreamHandler(sys.stdout)
@@ -36,7 +36,7 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     checkpoint = torch.load(args.checkpoint, map_location=device)
     config = checkpoint['config']
-    print(config)
+    # print(config)
 
     num_feats = 1
     Model = load_model(config.model)
@@ -83,13 +83,17 @@ if __name__ == '__main__':
             skip_check=True
         )
 
-        # Visualize T-SNE
-        # col_pcd1 = get_colored_point_cloud_feature(pcd1, feature1.cpu(), args.voxel_size)
-        # col_pcd2 = get_colored_point_cloud_feature(pcd2, feature2.cpu(), args.voxel_size)
-        # o3d.visualization.draw_geometries([col_pcd1, col_pcd2])
-
         pcd_down1 = make_open3d_point_cloud(xyz_down1)
         pcd_down2 = make_open3d_point_cloud(xyz_down2)
+
+        # ---------------------Visualize T-SNE-----------------------
+        # col_pcd1 = get_colored_point_cloud_feature(pcd_down1, feature1.cpu(), args.voxel_size)
+        # col_pcd2 = get_colored_point_cloud_feature(pcd_down2, feature2.cpu(), args.voxel_size)
+        # o3d.visualization.draw_geometries([col_pcd1, col_pcd2])
+
+        col_pcd1, col_pcd2 = visualize_correspondence(pcd_down1, pcd_down2, feature1, feature2)
+        o3d.visualization.draw_geometries([col_pcd1, col_pcd2])
+        # -----------------------------------------------------------
 
         F1 = feature1.clone().detach()
         F2 = feature2.clone().detach()
@@ -102,15 +106,13 @@ if __name__ == '__main__':
         ransac_result = o3d.registration.registration_ransac_based_on_feature_matching(
             pcd_down1, pcd_down2, feat1, feat2,
             max_correspondence_distance=distance_threshold,
-            estimation_method=o3d.registration.TransformationEstimationPointToPoint(
-                False),
+            estimation_method=o3d.registration.TransformationEstimationPointToPoint(False),
             ransac_n=4,
-            checkers=[
-                o3d.registration.CorrespondenceCheckerBasedOnEdgeLength(0.9),
-                o3d.registration.CorrespondenceCheckerBasedOnDistance(
-                    distance_threshold)
-            ],
-            criteria=o3d.registration.RANSACConvergenceCriteria(4000000, 10000)
+            criteria=o3d.registration.RANSACConvergenceCriteria(200000, 10000),
+            # checkers=[
+            #     o3d.registration.CorrespondenceCheckerBasedOnEdgeLength(0.9),
+            #     o3d.registration.CorrespondenceCheckerBasedOnDistance(distance_threshold)
+            # ],
         )
 
         pcd1_transformed = copy.deepcopy(pcd1)

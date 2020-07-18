@@ -43,8 +43,7 @@ def compute_overlap_ratio(pcd0, pcd1, trans, voxel_size):
   pcd0_down = pcd0.voxel_down_sample(voxel_size)
   pcd1_down = pcd1.voxel_down_sample(voxel_size)
   matching01 = get_matching_indices(pcd0_down, pcd1_down, trans, voxel_size, 1)
-  matching10 = get_matching_indices(pcd1_down, pcd0_down, np.linalg.inv(trans),
-                                    voxel_size, 1)
+  matching10 = get_matching_indices(pcd1_down, pcd0_down, np.linalg.inv(trans), voxel_size, 1)
   overlap0 = len(matching01) / len(pcd0_down.points)
   overlap1 = len(matching10) / len(pcd1_down.points)
   return max(overlap0, overlap1)
