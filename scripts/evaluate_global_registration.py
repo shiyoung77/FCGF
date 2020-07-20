@@ -224,11 +224,11 @@ def execute_ransac_registration(source_down, target_down, source_fpfh, target_fp
         max_correspondence_distance=distance_threshold,
         estimation_method=o3d.registration.TransformationEstimationPointToPoint(False),
         ransac_n=4,
-        criteria=o3d.registration.RANSACConvergenceCriteria(200000, 10000),
-        # checkers=[
-        #     o3d.registration.CorrespondenceCheckerBasedOnEdgeLength(0.9),
-        #     o3d.registration.CorrespondenceCheckerBasedOnDistance(distance_threshold)
-        # ],
+        criteria=o3d.registration.RANSACConvergenceCriteria(400000, 10000),
+        checkers=[
+            # o3d.registration.CorrespondenceCheckerBasedOnEdgeLength(0.9),
+            # o3d.registration.CorrespondenceCheckerBasedOnDistance(distance_threshold)
+        ],
     )
     return ransac_result
 

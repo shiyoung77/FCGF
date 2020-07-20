@@ -340,7 +340,7 @@ class ContrastiveLossTrainer(AlignmentTrainer):
       hit_ratio = self.evaluate_hit_ratio(
           xyz0_corr, xyz1_corr, T_gt, thresh=self.config.hit_ratio_thresh)
       hit_ratio_meter.update(hit_ratio)
-      feat_match_ratio.update(hit_ratio > 0.05)
+      feat_match_ratio.update(hit_ratio > 0.2)  # 0.05
       matching_timer.toc()
 
       num_data += 1

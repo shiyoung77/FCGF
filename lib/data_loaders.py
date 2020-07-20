@@ -632,16 +632,12 @@ class KITTINMPairDataset(KITTIPairDataset):
 
 
 class ThreeDMatchPairDataset(IndoorPairDataset):
-  OVERLAP_RATIO = 0.5
+  OVERLAP_RATIO = 0.3
   DATA_FILES = {
-      # 'train': './config/train_3dmatch.txt',
-      # 'val': './config/val_3dmatch.txt',
-      # 'test': './config/test_3dmatch.txt'
-      'train': './config/train_icra21.txt',
-      'val': './config/val_icra21.txt',
-      'test': './config/test_icra21.txt'
+      'train': './config/train_3dmatch.txt',
+      'val': './config/val_3dmatch.txt',
+      'test': './config/test_3dmatch.txt'
   }
-
 
 class CustomizedDataset(IndoorPairDataset):
   OVERLAP_RATIO = 0.5
@@ -650,6 +646,7 @@ class CustomizedDataset(IndoorPairDataset):
       'val': './config/val_icra21.txt',
       'test': './config/test_icra21.txt'
   }
+    
 
 
 ALL_DATASETS = [ThreeDMatchPairDataset, KITTIPairDataset, KITTINMPairDataset, CustomizedDataset]
